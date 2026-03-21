@@ -509,7 +509,7 @@ TOP ATTACKERS:
 # Log File Analyzer End------------------------------------------------------------------------------------------------
 # About Section Start----------------------------------------------------------------------------------------------
 elif tool_selection == "🧑‍💻 About":
-    com.iframe("https://embed.lottiefiles.com/animation/4788", height=100, scrolling=True)
+    com.iframe("https://embed.lottiefiles.com/animation/4790", height=100, scrolling=True)
     st.title("🧑‍💻 About This Toolkit")
     st.divider()
 

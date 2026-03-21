@@ -14,7 +14,7 @@ A multi-tool CyberSecurity web application built with Python and Streamlit.
 
 🚀How to Run
 
-Method 1 -- just open any browser and type "cybertoolsbydms.streamlit.app" 
+Method 1 -- just open any browser and type "dhruvsukhadiya.streamlit.app" 
 
 Method 2:
 
