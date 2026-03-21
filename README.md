@@ -14,6 +14,10 @@ A multi-tool CyberSecurity web application built with Python and Streamlit.
 
 🚀How to Run
 
+Method 1 -- just open any browser and type "cybertoolsbydms.streamlit.app" 
+
+Method 2:
+
 step-1 -- Install dependencies:
 pip install -r requirements.txt
 
@@ -22,6 +26,8 @@ python -m streamlit run main.py
 
 step-3 -- Open in browser:
 http://localhost:8501
+
+
 
 📂Project Structure
 main.py -- Main Streamlit app
@@ -32,6 +38,7 @@ README.md -- Project documentation
 Python 3.x
 Streamlit
 Requests
+Pandas
 ipaddress(built-in)
 re(built-in)
 collections(built-in)
