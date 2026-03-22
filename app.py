@@ -9,15 +9,16 @@ import random
 import string
 import streamlit.components.v1 as com
 import pandas as pd
+import socket
 
 
 
 st.set_page_config(page_title="🛡️ Cybersecurity Toolkit")
 
-tool_selection = st.sidebar.selectbox("Choose an analyzer:", ("🏠 Home", "🌐IP Analyzer", "🔐Password Analyzer", "🔐Password Generator", "📧Phishing Analyzer", "🔗URL Analyzer","📥Log File","🧑‍💻 About"))
+tool_selection = st.sidebar.selectbox("Choose an analyzer:", ("🏠Home", "🌐IP Analyzer", "🔐Password Analyzer", "🔐Password Generator", "📧Phishing Analyzer", "🔗URL Analyzer","📥Log File","🔌Port Scanner","🧑‍💻 About"))
 st.sidebar.badge("Created by: Dhruv Sukhadiya", icon="👨‍💻")
 
-if tool_selection=="🏠 Home":
+if tool_selection=="🏠Home":
     com.iframe("https://embed.lottiefiles.com/animation/490", height=100, scrolling=True)
     st.title("Welcome to the Ultimate Cybersecurity Toolkit!")
     st.divider()
@@ -25,23 +26,26 @@ if tool_selection=="🏠 Home":
     with col1:
         st.markdown("""
 
-● 🌐 IP Analyzer
+**● 🌐 IP Analyzer**
                 
-● 🔐 Password Analyzer 
+**● 🔐 Password Analyzer** 
                 
-● 🔐 Password Generator
+**● 🔐 Password Generator**
+                    
+**● 🔌 Port Scanner**
                  
 """)
     with col2:
         st.markdown("""
 
-● 📧 Phishing Analyzer
+**● 📧 Phishing Analyzer**
                   
-● 🔗 URL Analyzer 
+**● 🔗 URL Analyzer** 
                 
-● 📥 Log File Analyzer
+**● 📥 Log File Analyzer**
+                    
 """)
-    st.info("This toolkit is designed to provide insights and analysis for various cybersecurity aspects. Please select a tool from the sidebar to begin your analysis.")
+    st.info("_This toolkit is designed to provide insights and analysis for various cybersecurity aspects. Please select a tool from the sidebar to begin your analysis._")
     
 
 #IP Analyze Start----------------------------------------------------------------------------------------------
@@ -58,6 +62,7 @@ elif tool_selection == "🌐IP Analyzer":
             st.info(f"""Your Public IP: 
                     
     {ip.text}""")
+
             st.warning(f"""If you using it in streamlit cloud, it will show the IP address of the server.
                      
 So, if you want to get your real IP address [tap here](https://whatismyipaddress.com/)""")
@@ -148,6 +153,7 @@ So, if you want to get your real IP address [tap here](https://whatismyipaddress
                 "(e.g., 2001:0db8:85a3:0000:0000:8a2e:0370:7334).")
 
 #IP Analyze End------------------------------------------------------------------------------------------------
+
 #Password Analyzer Start----------------------------------------------------------------------------------------------
 elif tool_selection == "🔐Password Analyzer":
     com.iframe("https://embed.lottiefiles.com/animation/1860", height=100, scrolling=True)
@@ -205,6 +211,7 @@ elif tool_selection == "🔐Password Analyzer":
                 st.write(f" - {improvement}")
                
 #Password Analyzer End------------------------------------------------------------------------------------------------
+
 # Password Generator Start----------------------------------------------------------------------------------------------
 elif tool_selection == "🔐Password Generator":
     com.iframe("https://embed.lottiefiles.com/animation/580", height=100, scrolling=True)
@@ -233,8 +240,8 @@ elif tool_selection == "🔐Password Generator":
             generated_password = ''.join(random.choice(characters) for i in range(0,password_length))
             st.success(f"Generated Password: {generated_password}")
 # Password Generator End------------------------------------------------------------------------------------------------
-#Phishing Analyzer Start----------------------------------------------------------------------------------------------
 
+#Phishing Analyzer Start----------------------------------------------------------------------------------------------
 elif tool_selection == "📧Phishing Analyzer":
     com.iframe("https://embed.lottiefiles.com/animation/1607", height=100, scrolling=True)
     st.title("📧 Phishing Analyzer")
@@ -264,6 +271,7 @@ elif tool_selection == "📧Phishing Analyzer":
             else:
                 st.error("❌ The email address format is invalid. Please enter a valid email address.")          
 #Phishing Analyzer End------------------------------------------------------------------------------------------------
+
 # URL Analyzer Start----------------------------------------------------------------------------------------------
 elif tool_selection == "🔗URL Analyzer":
     com.iframe("https://embed.lottiefiles.com/animation/7242", height=100, scrolling=True)
@@ -327,189 +335,275 @@ elif tool_selection == "🔗URL Analyzer":
                     for warning in Warning:
                         st.write(f" - {warning}")
 # URL Analyzer End------------------------------------------------------------------------------------------------
+
 # Log File Analyzer Start----------------------------------------------------------------------------------------------
 elif tool_selection == "📥Log File":
-    com.iframe("https://embed.lottiefiles.com/animation/1869", height=100, scrolling=True)
+
     st.title("📥 Log File Analyzer")
-    st.divider()
-    st.subheader("Upload a log file to analyze its contents for potential security issues.")
+    st.subheader("Upload a log file to analyze its contents.")
 
-   
-    uploaded_file = st.file_uploader(
-        "Choose a log file",
-        type=["csv", "log", "txt", "json"]
-    )
 
-    if uploaded_file:
-        # ── STEP 1: File load karo ──────────────────────────────
-        try:
-            if uploaded_file.name.endswith('.csv'):
-                df = pd.read_csv(uploaded_file)
+    uploaded_file = st.file_uploader("Choose a log file",type=["csv", "log", "txt", "json"])
 
-            elif uploaded_file.name.endswith('.json'):
-                df = pd.read_json(uploaded_file)
+    if not uploaded_file:
+        st.info("Please upload a log file to analyze.")
+        st.stop()
 
-            elif uploaded_file.name.endswith(('.txt', '.log')):
-                content = uploaded_file.getvalue().decode("utf-8", errors="ignore")
-                lines = content.split('\n')
-                ip_pattern = r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}'
-                data = []
-                for line in lines:
-                    ip_match = re.search(ip_pattern, line)
-                    if ip_match:
-                        ip = ip_match.group()
-                        line_lower = line.lower()
-                        if any(w in line_lower for w in ['failed', 'error', 'denied', 'invalid', 'blocked', 'not pass', '0']):
-                            status = 'FAILED'
-                        elif any(w in line_lower for w in ['success', 'accepted', 'valid', 'pass']):
-                            status = 'SUCCESS'
-                        else:
-                            status = 'UNKNOWN'
-                        data.append({'ip': ip, 'status': status})
-                df = pd.DataFrame(data)
+    try:
 
-            st.success("✅ File loaded successfully!")
+        if uploaded_file.name.endswith('.csv'):
+            df = pd.read_csv(uploaded_file)
 
-        except Exception as e:
-            st.error(f"❌ File load nahi hua: {e}")
-            st.stop()
+        elif uploaded_file.name.endswith('.json'):
+            df = pd.read_json(uploaded_file)
 
-        # ── STEP 2: Status column dhundho ───────────────────────
-        status_keywords = ['status', 'result', 'outcome', 'state', 'pass']
-        status_col = None
-        for col in df.columns:
-            if any(keyword in col.lower() for keyword in status_keywords):
-                status_col = col
-                break
+        elif uploaded_file.name.endswith(('.txt', '.log')):
 
-        # ── STEP 3: IP column dhundho ───────────────────────────
-        ip_col = None
-        for col in df.columns:
-            if any(keyword in col.lower() for keyword in ['ip', 'address', 'host', 'source']):
-                ip_col = col
-                break
+            content = uploaded_file.getvalue().decode("utf-8", errors="ignore")
 
-        # ── STEP 4: Failed rows nikalo ──────────────────────────
-        failed_keywords = ['failed', 'fail', 'false', 'error',
-                           'denied', 'invalid', 'unauthorized',
-                           'not pass', '0', 'blocked']
+            lines = content.split('\n')
 
-        if status_col:
-            failed = df[df[status_col].str.lower().str.contains(
-                '|'.join(failed_keywords), na=False
-            )]
-            success = df[~df[status_col].str.lower().str.contains(
-                '|'.join(failed_keywords), na=False
-            )]
-        else:
-            failed = df
-            success = pd.DataFrame()
+            failed_words  = ['failed', 'error', 'denied', 'invalid',
+                             'blocked', 'not pass', '0']
 
-        # ── STEP 5: IP counts + Risk level ──────────────────────
-        if ip_col and not failed.empty:
-            ip_counts = failed.groupby(ip_col).size().reset_index()
-            ip_counts.columns = ['ip', 'failed_count']
-            ip_counts['risk'] = ip_counts['failed_count'].apply(
-                lambda x: '🔴 HIGH' if x > 5 else ('🟡 MEDIUM' if x > 2 else '🟢 LOW')
-            )
-            ip_counts = ip_counts.sort_values('failed_count', ascending=False)
-        else:
-            ip_counts = pd.DataFrame()
 
-        # ════════════════════════════════════════════════════════
-        # 📋 SUMMARY REPORT — EK PAGE MEIN SAB
-        # ════════════════════════════════════════════════════════
-        st.markdown("---")
-        st.title("📋 Security Summary Report")
-        st.caption(f"File: {uploaded_file.name}")
-        st.markdown("---")
+            success_words = ['success', 'accepted', 'valid', 'pass']
 
-        # ── Metrics Row 1 ────────────────────────────────────────
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.metric("📁 Total Events", len(df))
-        with col2:
-            st.metric("❌ Failed Events", len(failed))
-        with col3:
-            st.metric("✅ Success Events", len(success))
-        with col4:
-            unique_ips = len(ip_counts) if not ip_counts.empty else 0
-            st.metric("🌐 Unique IPs", unique_ips)
+            ip_pattern = r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}'
 
-        # ── Metrics Row 2 ────────────────────────────────────────
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            high = len(ip_counts[ip_counts['risk'] == '🔴 HIGH']) if not ip_counts.empty else 0
-            st.metric("🔴 HIGH Risk IPs", high)
-        with col2:
-            medium = len(ip_counts[ip_counts['risk'] == '🟡 MEDIUM']) if not ip_counts.empty else 0
-            st.metric("🟡 MEDIUM Risk IPs", medium)
-        with col3:
-            low = len(ip_counts[ip_counts['risk'] == '🟢 LOW']) if not ip_counts.empty else 0
-            st.metric("🟢 LOW Risk IPs", low)
+            data = []
 
-        st.markdown("---")
+            for line in lines:
 
-        # ── Overall Status ───────────────────────────────────────
-        if not ip_counts.empty:
-            high_risk_ips = ip_counts[ip_counts['risk'] == '🔴 HIGH']
-            if not high_risk_ips.empty:
-                st.error(f"🚨 CRITICAL — {len(high_risk_ips)} HIGH RISK IP(s) detected! Immediate action required.")
-            elif medium > 0:
-                st.warning(f"⚠️ WARNING — {medium} MEDIUM RISK IP(s) detected. Monitor closely.")
+                ip_match = re.search(ip_pattern, line)
+
+
+                if ip_match:
+
+                    ip = ip_match.group()
+
+                    line_lower = line.lower()
+
+                    if any(word in line_lower for word in failed_words):
+                        status = 'FAILED'
+                    elif any(word in line_lower for word in success_words):
+                        status = 'SUCCESS'
+                    else:
+                        status = 'UNKNOWN'
+
+
+                    data.append({'ip': ip, 'status': status})
+
+            df = pd.DataFrame(data)
+
+        st.success("✅ File loaded successfully!")
+
+    except Exception as e:
+
+        st.error(f"❌ File load nahi hua — {e}")
+        st.stop()
+
+    status_col = None
+
+    for col in df.columns:
+        if any(word in col.lower() for word in ['status', 'result', 'outcome', 'state']):
+            status_col = col
+            break   
+
+    ip_col = None
+
+    for col in df.columns:
+        if any(word in col.lower() for word in ['ip', 'address', 'host', 'source']):
+            ip_col = col
+            break
+
+    failed_words = ['failed', 'fail', 'false', 'error',
+                    'denied', 'invalid', 'unauthorized',
+                    'not pass', '0', 'blocked']
+
+    if status_col:
+
+
+        failed  = df[df[status_col].str.lower().str.contains('|'.join(failed_words), na=False)]
+        success = df[~df[status_col].str.lower().str.contains('|'.join(failed_words), na=False)]
+
+
+    else:
+
+        failed  = df
+        success = pd.DataFrame() 
+
+
+    if ip_col and not failed.empty:
+
+        ip_counts = failed.groupby(ip_col).size().reset_index()
+
+        ip_counts.columns = ['ip', 'failed_count']
+
+
+        def get_risk_level(count):
+            if count > 5:
+                return '🔴 HIGH'
+
+            elif count > 2:
+                return '🟡 MEDIUM'
+
             else:
-                st.success("✅ SAFE — No high risk activity detected.")
-        else:
-            st.success("✅ SAFE — No suspicious activity detected.")
+                return '🟢 LOW'
+
+        ip_counts['risk'] = ip_counts['failed_count'].apply(get_risk_level)
+
+        ip_counts = ip_counts.sort_values('failed_count', ascending=False)
+
+    else:
+
+        ip_counts = pd.DataFrame()
+
+    st.markdown("---")
+    st.title("📋 Security Summary Report")
+    st.caption(f"File: {uploaded_file.name}")
+    st.markdown("---")
+
+
+
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("📁 Total Events",   len(df))
+    col2.metric("❌ Failed Events",  len(failed))
+    col3.metric("✅ Success Events", len(success))
+    col4.metric("🌐 Unique IPs",     len(ip_counts) if not ip_counts.empty else 0)
+
+
+
+    if not ip_counts.empty:
+        high_count   = len(ip_counts[ip_counts['risk'] == '🔴 HIGH'])
+        medium_count = len(ip_counts[ip_counts['risk'] == '🟡 MEDIUM'])
+        low_count    = len(ip_counts[ip_counts['risk'] == '🟢 LOW'])
+    else:
+
+        high_count = medium_count = low_count = 0
+
+    col1, col2, col3 = st.columns(3)
+    col1.metric("🔴 HIGH Risk IPs",   high_count)
+    col2.metric("🟡 MEDIUM Risk IPs", medium_count)
+    col3.metric("🟢 LOW Risk IPs",    low_count)
+
+    st.markdown("---")
+
+    # ── Overall status ────
+
+    if high_count > 0:
+        st.error(f"🚨 CRITICAL — {high_count} HIGH RISK IP(s) detected! Immediate action required.")
+    elif medium_count > 0:
+        st.warning(f"⚠️ WARNING — {medium_count} MEDIUM RISK IP(s) detected. Monitor closely.")
+    else:
+        st.success("✅ SAFE — No high risk activity detected.")
+
+    st.markdown("---")
+
+    # ── Top 5 Attackers table ───────
+    if not ip_counts.empty:
+        st.subheader("🏴‍☠️ Top 5 Attackers")
+
+        st.dataframe(ip_counts.head(5), use_container_width=True)
 
         st.markdown("---")
 
-        # ── Top 5 Attackers ──────────────────────────────────────
-        if not ip_counts.empty:
-            st.subheader("🏴‍☠️ Top 5 Attackers")
-            st.dataframe(ip_counts.head(5), use_container_width=True)
+        
 
-            st.markdown("---")
 
-            # ── Attack Chart ─────────────────────────────────────
-            st.subheader("📈 Attack Chart")
-            st.bar_chart(ip_counts.set_index('ip')['failed_count'])
+    with st.expander("🔍 View Raw Data"):
+        st.dataframe(df, use_container_width=True)
 
-            st.markdown("---")
+    st.markdown("---")
 
-        # ── Raw Data ─────────────────────────────────────────────
-        with st.expander("🔍 View Raw Data"):
-            st.dataframe(df, use_container_width=True)
 
-        st.markdown("---")
+    if not ip_counts.empty:
 
-        # ── Download Button ──────────────────────────────────────
-        if not ip_counts.empty:
-            report = f"""SECURITY SUMMARY REPORT
+        
+        report_text = f"""
+SECURITY SUMMARY REPORT
 ========================
-File: {uploaded_file.name}
+File        : {uploaded_file.name}
 Total Events: {len(df)}
-Failed Events: {len(failed)}
-Success Events: {len(success)}
-Unique IPs: {unique_ips}
-HIGH Risk IPs: {high}
-MEDIUM Risk IPs: {medium}
-LOW Risk IPs: {low}
+Failed      : {len(failed)}
+Success     : {len(success)}
+Unique IPs  : {len(ip_counts)}
+HIGH Risk   : {high_count}
+MEDIUM Risk : {medium_count}
+LOW Risk    : {low_count}
 
-TOP ATTACKERS:
+TOP ATTACKERS
+=============
 {ip_counts.head(10).to_string(index=False)}
-"""
-            st.download_button(
-                label="📥 Download Full Report",
-                data=report,
-                file_name="security_report.txt",
-                mime="text/plain"
-            )
-                            
+        """
+        st.download_button(label="📥 Download Full Report",data=report_text,file_name="security_report.txt",mime="text/plain")
 # Log File Analyzer End------------------------------------------------------------------------------------------------
+# PORT SCANNER START----------------------------------------------------------------------------------------------
+elif tool_selection == "🔌Port Scanner":
+    com.iframe("https://embed.lottiefiles.com/animation/5012", height=100, scrolling=True)
+    st.title("🔌 Port Scanner")
+    st.divider()
+    st.subheader("Enter an IP address or Domain to scan for open ports.")
+
+    target=st.text_input("Enter IP or Domain", placeholder="e.g., 192.168.1.1 or example.com")
+    start_port=st.number_input("Start Port",1,65535,1)
+    end_port=st.number_input("End Port",1,65535,100)
+
+    scan=st.button("Scan Ports")
+    if scan:
+        if not target:
+            st.error("⚠️ Please enter an IP address or domain to scan.")
+            st.stop()
+        if start_port > end_port:
+            st.error("⚠️ Start port must be less than or equal to end port.")
+            st.stop()
+        
+        try:
+            ip=socket.gethostbyname(target)
+            st.write(f"Scanning ....{ip}")
+        except Exception as e:
+            st.error(f"❌ Could not resolve target: {e}")
+            st.stop()
+        open_ports=[]
+        closed_ports=[]
+        progress=st.progress(0)
+        total_ports=end_port-start_port+1
+        for i,port in enumerate(range(start_port,end_port+1)):
+
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+                sock.settimeout(1)
+                result = sock.connect_ex((ip, port))
+                if result == 0:
+                    open_ports.append(port)
+                else:
+                    closed_ports.append(port)
+            progress.progress((i + 1) / total_ports)
+        st.write("Scan complete!")
+        st.success(f"""
+                   Open ports: {len(open_ports)}
+
+                    Closed ports: {len(closed_ports)}""")
+        if open_ports:
+            st.subheader("Open Ports")
+
+            for port in open_ports:
+                st.write(f"Port **{port}** ---> _**open**_.")
+        else:
+            st.info("No open ports found in the specified range.")
+
+        if closed_ports:
+            with st.expander("Closed Ports",expanded=False):
+                for port in closed_ports:
+                    st.write(f"Port **{port}** ---> _**closed**_.")
+        else:
+            st.info("No closed ports found in the specified range.")
+        
+
+            # PORT SCANNER END------------------------------------------------------------------------------------------------
+
 # About Section Start----------------------------------------------------------------------------------------------
 elif tool_selection == "🧑‍💻 About":
-    com.iframe("https://embed.lottiefiles.com/animation/4790", height=100, scrolling=True)
+    com.iframe("https://embed.lottiefiles.com/animation/501", height=100, scrolling=True)
     st.title("🧑‍💻 About This Toolkit")
     st.divider()
 
@@ -530,6 +624,7 @@ URLs, and log files through a clean web interface.
 - 📧 Phishing Analyzer: Detect risky email patterns and suspicious domains.
 - 🔗 URL Analyzer: Flag common phishing indicators in URLs.
 - 📥 Log File Analyzer: Extract and summarize IP addresses from uploaded logs.
+- 🔌 Port Scanner: Scan common ports for a given IP address.
 """
     )
 
@@ -542,7 +637,8 @@ URLs, and log files through a clean web interface.
     st.subheader("Tech stack")
     st.write("- Python")
     st.write("- Streamlit")
-    st.write("- Requests, Regex, Pandas, and built-in Python security utilities")
+    st.write("- Pandas")
+    st.write("- Requests, Regex, socket, and built-in Python security utilities")
 
     st.success("Built by Dhruv Sukhadiya with ❤️ for learning and sharing cybersecurity knowledge!")
 
@@ -551,6 +647,4 @@ URLs, and log files through a clean web interface.
         st.link_button("GitHub Profile", "https://github.com/dhruvshubh26-bit")
     with col2:
         st.link_button("LinkedIn Profile", "https://www.linkedin.com/in/dhruv-sukhadiya-348299368?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app")
-
-
 # About Section End----------------------------------------------------------------------------------------------

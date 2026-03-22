@@ -4,13 +4,13 @@ A multi-tool CyberSecurity web application built with Python and Streamlit.
 
 🔧 Tools Included
 
-🌐IP Analzer -- Analyze IP location,ISP,Threat level, and show on map
-🔐Password Analyzer -- Check Password strength with score and suggestions
-🔑Password Generator --Generate strong custom Password
-📧Phishing Analyzer -- Detect Phishing risks in email addresses
-🔗URL Analyzer -- Scan URLs for Phishing red flags
-📥Log File Analyzer -- Upload log files and detect suspicious ISP
-
+🌐IP Analzer         -- Analyze IP location,ISP,Threat level, and show on map
+🔐Password Analyzer  -- Check Password strength with score and suggestions
+🔑Password Generator -- Generate strong custom Password
+📧Phishing Analyzer  -- Detect Phishing risks in email addresses
+🔗URL Analyzer       -- Scan URLs for Phishing red flags
+📥Log File Analyzer  -- Upload log files and detect suspicious ISP
+🔌 Port Scanner      -- Scan common ports for a given IP address.
 
 🚀How to Run
 
