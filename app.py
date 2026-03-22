@@ -587,7 +587,7 @@ elif tool_selection == "🔌Port Scanner":
             st.subheader("Open Ports")
 
             for port in open_ports:
-                st.write(f"Port **{port}** ---> _**open**_.")
+                st.info(f"Port **{port}** ---> _**open**_.")
         else:
             st.info("No open ports found in the specified range.")
 
