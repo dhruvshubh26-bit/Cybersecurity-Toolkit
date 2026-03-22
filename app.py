@@ -10,6 +10,8 @@ import string
 import streamlit.components.v1 as com
 import pandas as pd
 import socket
+import whois
+from datetime import datetime
 
 
 
@@ -334,7 +336,43 @@ elif tool_selection == "🔗URL Analyzer":
                     st.warning(f"⚠️ This URL has {problems} potential red flags for phishing. Please review the following warnings and exercise caution when interacting with this URL:")
                     for warning in Warning:
                         st.write(f" - {warning}")
-# URL Analyzer End------------------------------------------------------------------------------------------------
+    # WHOIS check — domain age
+    st.markdown("---")
+    st.subheader("🔍 WHOIS Analysis")
+
+    try:
+        # URL se domain nikalo
+        # "https://google.com/search" → "google.com"
+        domain = url.split("//")[-1].split("/")[0]
+
+        
+        w = whois.whois(domain)
+        
+        created = w.creation_date
+        if isinstance(created, list):
+            created = created[0]
+        if hasattr(created, 'tzinfo') and created.tzinfo is not None:
+            created = created.replace(tzinfo=None)
+        
+        age_days = (datetime.now() - created).days
+        
+        # Info dikhao
+        col1, col2, col3 = st.columns(3)
+        col1.metric("📅 Domain Age", f"{age_days} days")
+        col2.metric("🏢 Registrar", w.registrar or "N/A")
+        col3.metric("🌍 Country", w.country or "N/A")
+        
+        # Risk level
+        if age_days < 30:
+            st.error("🔴 SUSPICIOUS — Domain bahut naya hai — phishing ho sakta hai!")
+        elif age_days < 180:
+            st.warning("🟡 CAUTION — Domain relatively naya hai.")
+        else:
+            st.success("🟢 SAFE — Domain kaafi purana hai — trusted ho sakta hai.")
+
+    except Exception as e:
+        st.warning(f"⚠️ WHOIS info nahi mili: {e}")
+    # URL Analyzer End------------------------------------------------------------------------------------------------
 
 # Log File Analyzer Start----------------------------------------------------------------------------------------------
 elif tool_selection == "📥Log File":
